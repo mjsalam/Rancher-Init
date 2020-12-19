@@ -1,0 +1,32 @@
+#cloud-config
+ssh_authorized_keys:
+  - ssh-...
+
+write_files:
+  - path: /cloud-config.yml
+    permissions: "0700"
+    owner: root
+    content: |
+      #cloud-config
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUsFfF7bTMeJeTS9sbvLr3xmgdR5io7l9nowbLV62iFqagYyU0lG3dFseo4TEzNi82K3gm6NYi76bS4uVs75+WMHvSRwwggFuGC2s0B6ywS+mfgsE3JtjM65bNT/r49hrNp+Bwgo/G8HR6QxeMGLkZiN7cuW5HmeAkYrZMEN7ZTv/HNTN/ENDRBDxSXgf/kzHKy3W4Wy+p1Ef75S88ZdgXQG9Br0xY5Xx5hVHEiP/TY7L3bWqeT6XeIhvboOuL/+PQucP/qacpCoTZGMPBEoQD4Y5DitxkbO6sblbZ4Nn1BqkIdjVh0pSIVW1p/8wiD/YuXBxi7nmIhUUn2x3E3dId mark@Marks-MBP
+
+
+      mounts:
+       - ["/dev/vdb1", "/mnt", "ext4", ""] 
+
+      rancher:
+        services:
+          rancher-server:
+            image: rancher/server:stable
+            ports:
+              - 8080:8080
+            restart: always
+            volumes:
+              - /mnt/rancher-server-mysql:/var/lib/mysql
+  - path: /opt/rancher/bin/start.sh
+    permissions: "0700"
+    owner: root
+    content: |
+      #!/bin/bash
+      echo y | ros install -f -c /cloud-config.yml -d /dev/vda
